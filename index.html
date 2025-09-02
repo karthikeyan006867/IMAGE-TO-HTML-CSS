@@ -5,55 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image to HTML/CSS Generator</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 20px;
+      min-height: 100vh;
       transition: background 0.5s ease;
+      line-height: 1.6;
     }
 
     /* Default Theme (Purple + Black) */
     body.theme1 {
-      background: linear-gradient(135deg, purple, black);
+      background: linear-gradient(135deg, #8B3A9C, #2C1810, #1a1a1a);
+      background-attachment: fixed;
     }
     .container.theme1 {
       background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
       color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .theme1 .theme-toggle {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .theme1 .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.3);
     }
 
     /* Theme 2 (Yellow + White) */
     body.theme2 {
-      background: linear-gradient(135deg, yellow, white);
+      background: linear-gradient(135deg, #FFD700, #FFF8DC, #F0F8FF);
+      background-attachment: fixed;
     }
     .container.theme2 {
       background: rgba(255, 255, 255, 0.9);
-      color: black;
+      backdrop-filter: blur(10px);
+      color: #333;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .theme2 .theme-toggle {
+      background: rgba(0, 0, 0, 0.1);
+      color: #333;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+    .theme2 .theme-toggle:hover {
+      background: rgba(0, 0, 0, 0.15);
     }
 
     .theme-toggle {
       position: fixed;
-      top: 15px;
-      right: 15px;
-      padding: 10px 15px;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
       border: none;
-      border-radius: 8px;
+      border-radius: 25px;
       cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s ease, background 0.3s ease;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
     }
     .theme-toggle:active {
-      transform: scale(0.9);
+      transform: scale(0.95);
+    }
+    .theme-toggle:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
     }
 
     .container {
-      max-width: 900px;
-      margin: 80px auto;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.3);
-      transition: background 0.5s ease, color 0.5s ease;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      transition: all 0.5s ease;
       text-align: center;
       animation: fadeIn 1s ease;
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px;
+        padding: 30px 20px;
+        border-radius: 15px;
+      }
+      .theme-toggle {
+        top: 15px;
+        right: 15px;
+        padding: 10px 16px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 10px;
+        padding: 25px 15px;
+      }
+      body {
+        padding: 10px;
+      }
     }
 
     @keyframes fadeIn {
@@ -62,11 +122,33 @@
     }
 
     h1 {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #4CAF50, #2196F3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 25px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 20px;
+      }
     }
 
     .file-upload {
-      margin: 20px 0;
+      margin: 30px 0;
+      position: relative;
     }
 
     input[type="file"] {
@@ -75,71 +157,248 @@
 
     .custom-file-upload {
       display: inline-block;
-      padding: 10px 20px;
-      border-radius: 8px;
+      padding: 15px 30px;
+      border-radius: 12px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 16px;
       transition: all 0.3s ease;
-      background: #ff9800;
+      background: linear-gradient(135deg, #ff9800, #ff5722);
       color: white;
+      border: none;
+      box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+      position: relative;
+      overflow: hidden;
     }
+    
+    .custom-file-upload::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .custom-file-upload:hover::before {
+      left: 100%;
+    }
+    
     .custom-file-upload:hover {
-      background: #e68900;
+      background: linear-gradient(135deg, #e68900, #e64a19);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
     }
+    
     .custom-file-upload:active {
-      transform: scale(0.95);
+      transform: translateY(0) scale(0.98);
+    }
+    
+    .custom-file-upload:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.3);
     }
 
     .preview {
-      margin: 20px 0;
+      margin: 30px 0;
+      min-height: 120px;
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      position: relative;
     }
+    
+    .preview:empty::before {
+      content: "📷 Image preview will appear here";
+      color: rgba(255, 255, 255, 0.6);
+      font-style: italic;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .container.theme2 .preview {
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    .container.theme2 .preview:empty::before {
+      color: rgba(0, 0, 0, 0.5);
+    }
+    
     .preview img {
       max-width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      max-height: 400px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+    
+    .preview img:hover {
+      transform: scale(1.02);
     }
 
     textarea {
       width: 100%;
-      height: 220px;
-      margin-top: 20px;
-      padding: 10px;
-      font-family: monospace;
+      height: 250px;
+      margin-top: 25px;
+      padding: 20px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
       font-size: 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      resize: none;
+      line-height: 1.5;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      resize: vertical;
+      background: rgba(0, 0, 0, 0.1);
+      color: inherit;
+      transition: all 0.3s ease;
+      min-height: 150px;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .container.theme2 textarea {
+      border-color: rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.7);
+    }
+    
+    .container.theme2 textarea:focus {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    @media (max-width: 768px) {
+      textarea {
+        height: 200px;
+        padding: 15px;
+        font-size: 13px;
+      }
     }
 
     button {
-      margin: 10px;
-      padding: 10px 20px;
+      margin: 15px 8px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 14px;
       transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 100px;
     }
 
     button:hover {
-      opacity: 0.9;
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     }
+    
     button:active {
-      transform: scale(0.95);
+      transform: translateY(0) scale(0.98);
+    }
+    
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    button:hover::before {
+      left: 100%;
     }
 
     .generate-btn {
-      background: #4CAF50;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
       color: white;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     }
+    
     .copy-btn {
-      background: #2196F3;
+      background: linear-gradient(135deg, #2196F3, #1976D2);
       color: white;
+      box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
     }
+    
     .download-btn {
-      background: #f44336;
+      background: linear-gradient(135deg, #f44336, #d32f2f);
       color: white;
+      box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+    }
+    
+    @media (max-width: 480px) {
+      button {
+        margin: 10px 5px;
+        padding: 10px 20px;
+        font-size: 13px;
+        min-width: 80px;
+      }
+    }
+    /* Additional utilities and polish */
+    .button-group {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 25px;
+    }
+    
+    .copy-success {
+      background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+      animation: pulse 0.6s ease-in-out;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Improved focus accessibility */
+    *:focus-visible {
+      outline: 2px solid #4A90E2;
+      outline-offset: 2px;
+    }
+    
+    /* Loading state for generate button */
+    .generate-btn.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    
+    .generate-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      margin: auto;
+      border: 2px solid transparent;
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -158,9 +417,11 @@
     <button class="generate-btn" onclick="generateCode()" style="display:none;" id="generateBtn">Generate Code</button>
 
     <textarea id="codeOutput" placeholder="Generated HTML/CSS will appear here..."></textarea>
-    <br>
-    <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
-    <button class="download-btn" onclick="downloadCode()">Download</button>
+    
+    <div class="button-group">
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
+      <button class="download-btn" onclick="downloadCode()">Download</button>
+    </div>
   </div>
 
   <script>
@@ -218,14 +479,29 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
-  background: #f0f0f0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.image-container {
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 img {
-  max-width: 90%;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+  object-fit: contain;
 }
 </style>
 </head>
@@ -238,11 +514,28 @@ img {
 
     function copyCode() {
       const codeOutput = document.getElementById('codeOutput');
-      codeOutput.select();
-      document.execCommand('copy');
       const copyBtn = document.getElementById('copyBtn');
-      copyBtn.innerText = "Copied!";
-      setTimeout(() => copyBtn.innerText = "Copy", 2000);
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(codeOutput.value).then(() => {
+          copyBtn.classList.add('copy-success');
+          copyBtn.innerText = "Copied!";
+          setTimeout(() => {
+            copyBtn.classList.remove('copy-success');
+            copyBtn.innerText = "Copy";
+          }, 2000);
+        });
+      } else {
+        // Fallback for older browsers
+        codeOutput.select();
+        document.execCommand('copy');
+        copyBtn.classList.add('copy-success');
+        copyBtn.innerText = "Copied!";
+        setTimeout(() => {
+          copyBtn.classList.remove('copy-success');
+          copyBtn.innerText = "Copy";
+        }, 2000);
+      }
     }
 
     function downloadCode() {
